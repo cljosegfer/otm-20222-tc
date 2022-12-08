@@ -8,6 +8,8 @@ Created on Thu Dec  8 16:59:04 2022
 
 import pandas as pd
 import numpy as np
+from silh import silh
+import matplotlib.pyplot as plt
 
 def M(x):
     # _, count = np.unique(x, return_counts = True)
@@ -54,30 +56,50 @@ priori = [weibull(t_0i, eta_i, beta_i) for (t_0i, eta_i, beta_i) in zip(t_0, eta
 
 f = equipdb['f'].values
 
-# test eval
-X = []
+# # test eval
+# X = []
 
-# random
-x = np.random.choice(len(mpdb), len(equipdb)) + 1
-print('M: {} | F: {}'.format(M(x), F(x)))
-X.append(x)
+# # random
+# x = np.random.choice(len(mpdb), len(equipdb)) + 1
+# print('M: {} | F: {}'.format(M(x), F(x)))
+# X.append(x)
 
-# min M
-x = np.ones(shape = 500)
-print('M: {} | F: {}'.format(M(x), F(x)))
-X.append(x)
+# # min M
+# x = np.ones(shape = 500)
+# print('M: {} | F: {}'.format(M(x), F(x)))
+# X.append(x)
 
-# min F
-x = np.ones(shape = 500) * 3
-print('M: {} | F: {}'.format(M(x), F(x)))
-X.append(x)
+# # min F
+# x = np.ones(shape = 500) * 3
+# print('M: {} | F: {}'.format(M(x), F(x)))
+# X.append(x)
 
-# export
-X = pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index = False)
+# # export
+# X = pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index = False)
 
 # solucao intuitiva eh fazer manutencao nos aparelhos caros e antigos
 # logo, uma ideia eh ordenar o f*priori e fazer manutencao gradual
 esperado = priori * f
+# silh(np.copy(esperado), 'E(pf)', 'F esperado iniciado')
 
+importancia = np.argsort(esperado)[::-1]
+
+# modulo deslizante
+num = 100
+alphas = np.linspace(start = 0, stop = 1, num = num)
+log = []
+for alpha in alphas:
+    N = int(len(equipdb) * alpha)
+    x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+    x = x[importancia]
+    
+    log.append(F(x))
+
+# plot
+plt.figure()
+plt.plot(alphas, log)
+plt.xlabel('alpha')
+plt.ylabel('F(x)')
+plt.show()
 
 
