@@ -82,16 +82,28 @@ f = equipdb['f'].values
 esperado = priori * f
 # silh(np.copy(esperado), 'E(pf)', 'F esperado iniciado')
 
-importancia = np.argsort(esperado)[::-1]
+importancia = np.argsort(esperado)
 
-# modulo deslizante
+# modulo deslizante 1d
+# alpha = 0.5
+
+# N = int(len(equipdb) * alpha)
+# x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+# x = x[importancia.argsort()]
+
+# # verifica
+# log = []
+# for i in importancia:
+#     log.append([i, x[i]])
+# log = np.array(log)
+
 num = 100
 alphas = np.linspace(start = 0, stop = 1, num = num)
 log = []
 for alpha in alphas:
     N = int(len(equipdb) * alpha)
     x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
-    x = x[importancia]
+    x = x[importancia.argsort()]
     
     log.append(F(x))
 
@@ -101,5 +113,3 @@ plt.plot(alphas, log)
 plt.xlabel('alpha')
 plt.ylabel('F(x)')
 plt.show()
-
-
