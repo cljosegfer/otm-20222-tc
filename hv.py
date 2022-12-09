@@ -26,6 +26,11 @@ def F(x):
     p = [prob(t_0i, k_i, eta_i, beta_i, priori_i) for (t_0i, k_i, eta_i, beta_i, priori_i) in zip(t_0, k, eta, beta, priori)]
     return np.sum(p * f)
 
+def F_ns(x):
+    k = [(-x_i + 5) / 2 for x_i in x]
+    p = [prob(t_0i, k_i, eta_i, beta_i, priori_i) for (t_0i, k_i, eta_i, beta_i, priori_i) in zip(t_0, k, eta, beta, priori)]
+    return p * f
+
 def hv(m, f):
     return (1000 - m)*(1745.4898 - f) / (1745.4898 - 1048.1788) / 1000
     
@@ -53,13 +58,28 @@ priori = [weibull(t_0i, eta_i, beta_i) for (t_0i, eta_i, beta_i) in zip(t_0, eta
 f = equipdb['f'].values
 
 # sol
-esperado = priori * f
+# esperado = priori * f
+esperado = F_ns(x = np.ones(shape = 500))
 importancia = np.argsort(esperado)
 
+# num = 10
+# alphas = np.linspace(start = 0, stop = 1, num = num)
+# log = []
+# logloglog = []
+# for alpha in alphas:
+#     N = int(len(equipdb) * alpha)
+#     x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+#     x = x[importancia.argsort()]
+    
+#     log.append(F(x))
+#     logloglog.append([x, alpha, M(x), F(x)])
+
 N = len(equipdb)
-num = 10
-alphas = np.linspace(start = 0, stop = 0.9, num = num)
-gamas = np.linspace(start = 0, stop = 0.9, num = num)
+num = 100
+start = 0.0
+stop = 1.0
+alphas = np.linspace(start = start, stop = stop, num = num)
+gamas = np.linspace(start = start, stop = stop, num = num)
 log = []
 logloglog = []
 for alpha in tqdm(alphas):

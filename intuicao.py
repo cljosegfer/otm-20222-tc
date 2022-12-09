@@ -26,6 +26,11 @@ def F(x):
     p = [prob(t_0i, k_i, eta_i, beta_i, priori_i) for (t_0i, k_i, eta_i, beta_i, priori_i) in zip(t_0, k, eta, beta, priori)]
     return np.sum(p * f)
 
+def F_ns(x):
+    k = [(-x_i + 5) / 2 for x_i in x]
+    p = [prob(t_0i, k_i, eta_i, beta_i, priori_i) for (t_0i, k_i, eta_i, beta_i, priori_i) in zip(t_0, k, eta, beta, priori)]
+    return p * f
+    
 def hv(m, f):
     return (1000 - m)*(1745.4898 - f) / (1745.4898 - 1048.1788) / 1000
     
@@ -57,7 +62,10 @@ f = equipdb['f'].values
 
 # solucao intuitiva eh fazer manutencao nos aparelhos caros e antigos
 # logo, uma ideia eh ordenar o f*priori e fazer manutencao gradual
-esperado = priori * f
+# esperado = priori * f
+worst = F_ns(x = np.ones(shape = 500))
+esperado = np.copy(worst)
+
 # silh(np.copy(esperado), 'E(pf)', 'F esperado iniciado')
 
 importancia = np.argsort(esperado)
@@ -75,35 +83,35 @@ importancia = np.argsort(esperado)
 #     log.append([i, x[i]])
 # log = np.array(log)
 
-# num = 100
-# alphas = np.linspace(start = 0, stop = 1, num = num)
-# log = []
-# logloglog = []
-# for alpha in alphas:
-#     N = int(len(equipdb) * alpha)
-#     x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
-#     x = x[importancia.argsort()]
+num = 100
+alphas = np.linspace(start = 0, stop = 1, num = num)
+log = []
+logloglog = []
+for alpha in alphas:
+    N = int(len(equipdb) * alpha)
+    x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+    x = x[importancia.argsort()]
     
-#     log.append(F(x))
-#     logloglog.append([x, alpha, M(x), F(x)])
+    log.append(F(x))
+    logloglog.append([x, alpha, M(x), F(x)])
 
-# # plot
-# plt.figure()
-# plt.plot(alphas, log)
-# plt.xlabel('alpha')
-# plt.ylabel('F(x)')
-# # plt.show()
-# plt.savefig('fig/intuicao1d.png', dpi = 150)
-
-# hv = [hv(report[-2], report[-1]) for report in logloglog]
-# alpha = logloglog[np.argmax(hv)][1]
-# print(alpha)
-
-# plt.figure()
-# plt.plot(alphas, hv)
-# plt.xlabel('alpha')
-# plt.ylabel('HV')
+# plot
+plt.figure()
+plt.plot(alphas, log)
+plt.xlabel('alpha')
+plt.ylabel('F(x)')
 # plt.show()
+plt.savefig('fig/intuicao1d.png', dpi = 150)
+
+hv = [hv(report[-2], report[-1]) for report in logloglog]
+alpha = logloglog[np.argmax(hv)][1]
+print(alpha)
+
+plt.figure()
+plt.plot(alphas, hv)
+plt.xlabel('alpha')
+plt.ylabel('HV')
+plt.show()
 
 # modulo deslizante 2d
 # N = len(equipdb)
@@ -120,47 +128,47 @@ importancia = np.argsort(esperado)
 #                 np.ones(shape = detalhada) * 3))
 # x = x[importancia.argsort()]
 
-N = len(equipdb)
-num = 100
-alphas = np.linspace(start = 0, stop = 1, num = num)
-gamas = np.linspace(start = 0, stop = 1, num = num)
-log = []
-logloglog = []
-for alpha in tqdm(alphas):
-    loglog = []
-    for gama in gamas:
-        if alpha + gama > 1:
-            loglog.append(1e3)
-            continue
+# N = len(equipdb)
+# num = 100
+# alphas = np.linspace(start = 0, stop = 1, num = num)
+# gamas = np.linspace(start = 0, stop = 1, num = num)
+# log = []
+# logloglog = []
+# for alpha in tqdm(alphas):
+#     loglog = []
+#     for gama in gamas:
+#         if alpha + gama > 1:
+#             loglog.append(1e3)
+#             continue
         
-        nenhuma = int(alpha * N)
-        intermediaria = int(gama * N)
-        detalhada = 500 - nenhuma - intermediaria
+#         nenhuma = int(alpha * N)
+#         intermediaria = int(gama * N)
+#         detalhada = 500 - nenhuma - intermediaria
         
-        x = np.hstack((np.ones(shape = nenhuma), 
-                        np.ones(shape = intermediaria) * 2, 
-                        np.ones(shape = detalhada) * 3))
-        x = x[importancia.argsort()]
-        logloglog.append([x, alpha, gama, M(x), F(x)])
+#         x = np.hstack((np.ones(shape = nenhuma), 
+#                         np.ones(shape = intermediaria) * 2, 
+#                         np.ones(shape = detalhada) * 3))
+#         x = x[importancia.argsort()]
+#         logloglog.append([x, alpha, gama, M(x), F(x)])
         
-        loglog.append(F(x))
-    log.append(loglog)
-log = np.array(log).T
+#         loglog.append(F(x))
+#     log.append(loglog)
+# log = np.array(log).T
 
-hv = [hv(report[-2], report[-1]) for report in logloglog]
-param = logloglog[np.argmax(hv)][1:3]
-print(param)
+# hv = [hv(report[-2], report[-1]) for report in logloglog]
+# param = logloglog[np.argmax(hv)][1:3]
+# print(param)
 
-plt.figure()
-plt.plot(hv)
-plt.ylabel('HV')
-plt.show()
-
-# plot
-plt.figure()
-extent = [gamas[0], gamas[-1], alphas[-1], alphas[0]]
-plt.imshow(log, cmap = 'gray', extent = extent)
-plt.xlabel('gama')
-plt.ylabel('alpha')
+# plt.figure()
+# plt.plot(hv)
+# plt.ylabel('HV')
 # plt.show()
-plt.savefig('fig/intuicao2d.png', dpi = 150)
+
+# # plot
+# plt.figure()
+# extent = [gamas[0], gamas[-1], alphas[-1], alphas[0]]
+# plt.imshow(log, cmap = 'gray', extent = extent)
+# plt.xlabel('gama')
+# plt.ylabel('alpha')
+# # plt.show()
+# plt.savefig('fig/intuicao2d.png', dpi = 150)

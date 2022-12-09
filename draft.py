@@ -32,6 +32,11 @@ def F(x):
     p = [prob(t_0i, k_i, eta_i, beta_i, priori_i) for (t_0i, k_i, eta_i, beta_i, priori_i) in zip(t_0, k, eta, beta, priori)]
     return np.sum(p * f)
 
+def F_ns(x):
+    k = [(-x_i + 5) / 2 for x_i in x]
+    p = [prob(t_0i, k_i, eta_i, beta_i, priori_i) for (t_0i, k_i, eta_i, beta_i, priori_i) in zip(t_0, k, eta, beta, priori)]
+    return p * f
+
 # read
 equipdb = pd.read_csv('tc/EquipDB.csv', header = None, 
                       names = ['id', 't_0', 'cluster', 'f'])
@@ -61,7 +66,8 @@ f = equipdb['f'].values
 X = []
 
 # selected
-esperado = priori * f
+# esperado = priori * f
+esperado = F_ns(x = np.ones(shape = 500))
 importancia = np.argsort(esperado)
 
 # alpha = 0.5555555555555555555555
@@ -99,7 +105,7 @@ importancia = np.argsort(esperado)
 # sol_F = F(x)
 
 N = len(equipdb)
-num = 10
+num = 100
 start = 0
 stop = 1
 alphas = np.linspace(start = start, stop = stop, num = num)
