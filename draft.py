@@ -101,7 +101,7 @@ importancia = np.argsort(esperado)
 N = len(equipdb)
 num = 10
 start = 0
-stop = 0.9
+stop = 1
 alphas = np.linspace(start = start, stop = stop, num = num)
 gamas = np.linspace(start = start, stop = stop, num = num)
 for alpha in tqdm(alphas):

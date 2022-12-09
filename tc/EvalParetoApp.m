@@ -103,8 +103,10 @@ area = 0;
 for i = 1:length(front)
     if i < length(front)
         area = area + ((front(1,i+1)-front(1,i))*(nadir(2,1)-front(2,i)));
+        fprintf('area: %9.4f\n',area)
     else
         area = area + ((nadir(1,1)-front(1,i))*(nadir(2,1)-front(2,i)));
+        fprintf('area: %9.4f\n',area)
     end
 end
 %-------------------------------------------------------------------------
