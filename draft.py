@@ -57,109 +57,35 @@ priori = [weibull(t_0i, eta_i, beta_i) for (t_0i, eta_i, beta_i) in zip(t_0, eta
 
 f = equipdb['f'].values
 
-# # test eval
-# X = []
+# test eval
+X = []
 
-# # random
-# x = np.random.choice(len(mpdb), len(equipdb)) + 1
-# print('M: {} | F: {}'.format(M(x), F(x)))
-# X.append(x)
+# random
+x = np.random.choice(len(mpdb), len(equipdb)) + 1
+print('M: {} | F: {}'.format(M(x), F(x)))
+X.append(x)
+sol_M = M(x)
+sol_F = F(x)
 
-# # min M
-# x = np.ones(shape = 500)
-# print('M: {} | F: {}'.format(M(x), F(x)))
-# X.append(x)
+# min M
+x = np.ones(shape = 500)
+print('M: {} | F: {}'.format(M(x), F(x)))
+X.append(x)
+min_M = M(x)
+max_F = F(x)
 
-# # min F
-# x = np.ones(shape = 500) * 3
-# print('M: {} | F: {}'.format(M(x), F(x)))
-# X.append(x)
+# min F
+x = np.ones(shape = 500) * 3
+print('M: {} | F: {}'.format(M(x), F(x)))
+X.append(x)
+max_M = M(x)
+min_F = F(x)
 
-# # export
-# X = pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index = False)
+# export
+X = pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index = False)
 
-# solucao intuitiva eh fazer manutencao nos aparelhos caros e antigos
-# logo, uma ideia eh ordenar o f*priori e fazer manutencao gradual
-esperado = priori * f
-# silh(np.copy(esperado), 'E(pf)', 'F esperado iniciado')
-
-importancia = np.argsort(esperado)
-
-# modulo deslizante 1d
-# alpha = 0.5
-
-# N = int(len(equipdb) * alpha)
-# x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
-# x = x[importancia.argsort()]
-
-# # verifica
-# log = []
-# for i in importancia:
-#     log.append([i, x[i]])
-# log = np.array(log)
-
-num = 100
-alphas = np.linspace(start = 0, stop = 1, num = num)
-log = []
-for alpha in alphas:
-    N = int(len(equipdb) * alpha)
-    x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
-    x = x[importancia.argsort()]
-    
-    log.append(F(x))
-
-# plot
-plt.figure()
-plt.plot(alphas, log)
-plt.xlabel('alpha')
-plt.ylabel('F(x)')
-# plt.show()
-plt.savefig('fig/intuicao1d.png', dpi = 150)
-
-# modulo deslizante 2d
-N = len(equipdb)
-
-alpha = 0.3
-gama = 0.4
-
-nenhuma = int(0.3 * N)
-intermediaria = int(0.4 * N)
-detalhada = 500 - nenhuma - intermediaria
-
-x = np.hstack((np.ones(shape = nenhuma), 
-                np.ones(shape = intermediaria) * 2, 
-                np.ones(shape = detalhada) * 3))
-x = x[importancia.argsort()]
-
-num = 100
-alphas = np.linspace(start = 0, stop = 1, num = num)
-gamas = np.linspace(start = 0, stop = 1, num = num)
-log = []
-for alpha in tqdm(alphas):
-    loglog = []
-    for gama in gamas:
-        if alpha + gama > 1:
-            loglog.append(1e3)
-            continue
-        
-        nenhuma = int(alpha * N)
-        intermediaria = int(gama * N)
-        detalhada = 500 - nenhuma - intermediaria
-        
-        x = np.hstack((np.ones(shape = nenhuma), 
-                        np.ones(shape = intermediaria) * 2, 
-                        np.ones(shape = detalhada) * 3))
-        x = x[importancia.argsort()]
-        
-        loglog.append(F(x))
-    log.append(loglog)
-log = np.array(log).T
-
-# plot
-plt.figure()
-extent = [gamas[0], gamas[-1], alphas[-1], alphas[0]]
-plt.imshow(log, cmap = 'gray', extent = extent)
-plt.xlabel('gama')
-plt.ylabel('alpha')
-# plt.show()
-plt.savefig('fig/intuicao2d.png', dpi = 150)
+# try predict s-metric
+ideal = (max_F - min_F) * (max_M - min_M)
+sol = (sol_F - min_F) * (sol_M - min_M)
+hv = sol / ideal
+print(hv)
