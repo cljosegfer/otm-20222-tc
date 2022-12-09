@@ -101,3 +101,34 @@ class rea():
             print('num: {} | sol: {} | filter: {} | time: {}'.format(num, len(X), len(export), deltat))
         
         return export, border
+
+    def pareto_naive(self, num = 100, report = True):
+        N = len(self.equipdb)
+        start = 0
+        stop = 1
+        
+        log = []
+        X = []
+        
+        alphas = np.linspace(start = start, stop = stop, num = num)
+        for alpha in tqdm(alphas):
+            nenhuma = int(alpha * N)
+            detalhada = 500 - nenhuma
+            
+            x = np.hstack((np.ones(shape = nenhuma), 
+                            np.ones(shape = detalhada) * 3))
+            x = x[self.importancia.argsort()]
+            X.append(x)
+            log.append([self.M(x), self.F(x)])
+        hv = np.array([[report[-2], report[-1]] for report in log])
+        mask, deltat = self._filter(hv)
+        border = hv[mask]
+
+        # export
+        export = pd.DataFrame(X).iloc[mask].astype('int32')
+        export.to_csv('tc/xhat.csv', header = False, index = False)
+        
+        if report:
+            print('num: {} | sol: {} | filter: {} | time: {}'.format(num, len(X), len(export), deltat))
+        
+        return export, border

@@ -8,6 +8,7 @@ Created on Fri Dec  9 09:37:37 2022
 
 from pareto import rea
 
-num = 150
+num = 100
 experimento = rea()
 export, border = experimento.pareto(num)
+# export, border = experimento.pareto_naive(num)
