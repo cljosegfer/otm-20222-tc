@@ -26,6 +26,12 @@ def F(x):
     p = [prob(t_0i, k_i, eta_i, beta_i, priori_i) for (t_0i, k_i, eta_i, beta_i, priori_i) in zip(t_0, k, eta, beta, priori)]
     return np.sum(p * f)
 
+def hv(m, f):
+    return (1000 - m)*(1745.4898 - f) / (1745.4898 - 1048.1788) / 1000
+    
+def hv_x(x):
+    return (1000 - M(x))*(1745.4898 - F(x)) / (1745.4898 - 1048.1788) / 1000
+
 # read
 equipdb = pd.read_csv('tc/EquipDB.csv', header = None, 
                       names = ['id', 't_0', 'cluster', 'f'])
@@ -79,7 +85,7 @@ importancia = np.argsort(esperado)
 #     x = x[importancia.argsort()]
     
 #     log.append(F(x))
-#     logloglog.append([x, alpha, M(x), F(x), (1000 - M(x))*(1745.4898 - F(x)) / (1745.4898 - 1048.1788) / 1000])
+#     logloglog.append([x, alpha, M(x), F(x)])
 
 # # plot
 # plt.figure()
@@ -89,7 +95,7 @@ importancia = np.argsort(esperado)
 # # plt.show()
 # plt.savefig('fig/intuicao1d.png', dpi = 150)
 
-# hv = [report[-1] for report in logloglog]
+# hv = [hv(report[-2], report[-1]) for report in logloglog]
 # alpha = logloglog[np.argmax(hv)][1]
 # print(alpha)
 
@@ -99,20 +105,20 @@ importancia = np.argsort(esperado)
 # plt.ylabel('HV')
 # plt.show()
 
-# # modulo deslizante 2d
-# # N = len(equipdb)
+# modulo deslizante 2d
+# N = len(equipdb)
 
-# # alpha = 0.3
-# # gama = 0.4
+# alpha = 0.3
+# gama = 0.4
 
-# # nenhuma = int(0.3 * N)
-# # intermediaria = int(0.4 * N)
-# # detalhada = 500 - nenhuma - intermediaria
+# nenhuma = int(0.3 * N)
+# intermediaria = int(0.4 * N)
+# detalhada = 500 - nenhuma - intermediaria
 
-# # x = np.hstack((np.ones(shape = nenhuma), 
-# #                 np.ones(shape = intermediaria) * 2, 
-# #                 np.ones(shape = detalhada) * 3))
-# # x = x[importancia.argsort()]
+# x = np.hstack((np.ones(shape = nenhuma), 
+#                 np.ones(shape = intermediaria) * 2, 
+#                 np.ones(shape = detalhada) * 3))
+# x = x[importancia.argsort()]
 
 N = len(equipdb)
 num = 100
@@ -141,7 +147,7 @@ for alpha in tqdm(alphas):
     log.append(loglog)
 log = np.array(log).T
 
-hv = [report[-1] for report in logloglog]
+hv = [hv(report[-2], report[-1]) for report in logloglog]
 param = logloglog[np.argmax(hv)][1:3]
 print(param)
 

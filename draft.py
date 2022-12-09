@@ -64,30 +64,60 @@ X = []
 esperado = priori * f
 importancia = np.argsort(esperado)
 
-alpha = 0.5555555555555555555555
-N = int(len(equipdb) * alpha)
-x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
-x = x[importancia.argsort()]
-print('M: {} | F: {}'.format(M(x), F(x)))
-X.append(x)
-sol_M = M(x)
-sol_F = F(x)
+# alpha = 0.5555555555555555555555
+# N = int(len(equipdb) * alpha)
+# x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+# x = x[importancia.argsort()]
+# print('M: {} | F: {}'.format(M(x), F(x)))
+# X.append(x)
+# sol_M = M(x)
+# sol_F = F(x)
 
-alpha = 0.3
-gama = 0.4
+# num = 100
+# alphas = np.linspace(start = 0.01, stop = 0.99, num = num)
+# for alpha in alphas:
+#     N = int(len(equipdb) * alpha)
+#     x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+#     x = x[importancia.argsort()]
+#     X.append(x)
 
-nenhuma = int(0.3 * N)
-intermediaria = int(0.4 * N)
-detalhada = 500 - nenhuma - intermediaria
+# N = len(equipdb)
+# alpha = 0.3
+# gama = 0.4
 
-x = np.hstack((np.ones(shape = nenhuma), 
-                np.ones(shape = intermediaria) * 2, 
-                np.ones(shape = detalhada) * 3))
-x = x[importancia.argsort()]
-print('M: {} | F: {}'.format(M(x), F(x)))
-X.append(x)
-sol_M = M(x)
-sol_F = F(x)
+# nenhuma = int(0.3 * N)
+# intermediaria = int(0.4 * N)
+# detalhada = 500 - nenhuma - intermediaria
+
+# x = np.hstack((np.ones(shape = nenhuma), 
+#                 np.ones(shape = intermediaria) * 2, 
+#                 np.ones(shape = detalhada) * 3))
+# x = x[importancia.argsort()]
+# print('M: {} | F: {}'.format(M(x), F(x)))
+# X.append(x)
+# sol_M = M(x)
+# sol_F = F(x)
+
+N = len(equipdb)
+num = 10
+start = 0
+stop = 0.9
+alphas = np.linspace(start = start, stop = stop, num = num)
+gamas = np.linspace(start = start, stop = stop, num = num)
+for alpha in tqdm(alphas):
+    for gama in gamas:
+        if alpha + gama > 1:
+            continue
+        
+        nenhuma = int(alpha * N)
+        intermediaria = int(gama * N)
+        detalhada = 500 - nenhuma - intermediaria
+        
+        x = np.hstack((np.ones(shape = nenhuma), 
+                        np.ones(shape = intermediaria) * 2, 
+                        np.ones(shape = detalhada) * 3))
+        x = x[importancia.argsort()]
+        X.append(x)
 
 # # random
 # x = np.random.choice(len(mpdb), len(equipdb)) + 1
@@ -113,8 +143,8 @@ min_F = F(x)
 # export
 pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index = False)
 
-# try predict s-metric
-ideal = (max_F - min_F) * (max_M - min_M)
-sol = (max_F - sol_F) * (max_M - sol_M)
-hv = sol / ideal
-print(hv)
+# # try predict s-metric
+# ideal = (max_F - min_F) * (max_M - min_M)
+# sol = (max_F - sol_F) * (max_M - sol_M)
+# hv = sol / ideal
+# print(hv)
