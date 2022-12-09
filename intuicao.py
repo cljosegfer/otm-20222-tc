@@ -69,43 +69,57 @@ importancia = np.argsort(esperado)
 #     log.append([i, x[i]])
 # log = np.array(log)
 
-num = 100
-alphas = np.linspace(start = 0, stop = 1, num = num)
-log = []
-for alpha in alphas:
-    N = int(len(equipdb) * alpha)
-    x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
-    x = x[importancia.argsort()]
+# num = 100
+# alphas = np.linspace(start = 0, stop = 1, num = num)
+# log = []
+# logloglog = []
+# for alpha in alphas:
+#     N = int(len(equipdb) * alpha)
+#     x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+#     x = x[importancia.argsort()]
     
-    log.append(F(x))
+#     log.append(F(x))
+#     logloglog.append([x, alpha, M(x), F(x), (1000 - M(x))*(1745.4898 - F(x)) / (1745.4898 - 1048.1788) / 1000])
 
-# plot
-plt.figure()
-plt.plot(alphas, log)
-plt.xlabel('alpha')
-plt.ylabel('F(x)')
+# # plot
+# plt.figure()
+# plt.plot(alphas, log)
+# plt.xlabel('alpha')
+# plt.ylabel('F(x)')
+# # plt.show()
+# plt.savefig('fig/intuicao1d.png', dpi = 150)
+
+# hv = [report[-1] for report in logloglog]
+# alpha = logloglog[np.argmax(hv)][1]
+# print(alpha)
+
+# plt.figure()
+# plt.plot(alphas, hv)
+# plt.xlabel('alpha')
+# plt.ylabel('HV')
 # plt.show()
-plt.savefig('fig/intuicao1d.png', dpi = 150)
 
-# modulo deslizante 2d
+# # modulo deslizante 2d
+# # N = len(equipdb)
+
+# # alpha = 0.3
+# # gama = 0.4
+
+# # nenhuma = int(0.3 * N)
+# # intermediaria = int(0.4 * N)
+# # detalhada = 500 - nenhuma - intermediaria
+
+# # x = np.hstack((np.ones(shape = nenhuma), 
+# #                 np.ones(shape = intermediaria) * 2, 
+# #                 np.ones(shape = detalhada) * 3))
+# # x = x[importancia.argsort()]
+
 N = len(equipdb)
-
-alpha = 0.3
-gama = 0.4
-
-nenhuma = int(0.3 * N)
-intermediaria = int(0.4 * N)
-detalhada = 500 - nenhuma - intermediaria
-
-x = np.hstack((np.ones(shape = nenhuma), 
-                np.ones(shape = intermediaria) * 2, 
-                np.ones(shape = detalhada) * 3))
-x = x[importancia.argsort()]
-
 num = 100
 alphas = np.linspace(start = 0, stop = 1, num = num)
 gamas = np.linspace(start = 0, stop = 1, num = num)
 log = []
+logloglog = []
 for alpha in tqdm(alphas):
     loglog = []
     for gama in gamas:
@@ -121,10 +135,20 @@ for alpha in tqdm(alphas):
                         np.ones(shape = intermediaria) * 2, 
                         np.ones(shape = detalhada) * 3))
         x = x[importancia.argsort()]
+        logloglog.append([x, alpha, gama, M(x), F(x)])
         
         loglog.append(F(x))
     log.append(loglog)
 log = np.array(log).T
+
+hv = [report[-1] for report in logloglog]
+param = logloglog[np.argmax(hv)][1:3]
+print(param)
+
+plt.figure()
+plt.plot(hv)
+plt.ylabel('HV')
+plt.show()
 
 # plot
 plt.figure()

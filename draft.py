@@ -60,12 +60,41 @@ f = equipdb['f'].values
 # test eval
 X = []
 
-# random
-x = np.random.choice(len(mpdb), len(equipdb)) + 1
+# selected
+esperado = priori * f
+importancia = np.argsort(esperado)
+
+alpha = 0.5555555555555555555555
+N = int(len(equipdb) * alpha)
+x = np.hstack((np.ones(shape = N), np.ones(shape = len(equipdb) - N) * 3))
+x = x[importancia.argsort()]
 print('M: {} | F: {}'.format(M(x), F(x)))
 X.append(x)
 sol_M = M(x)
 sol_F = F(x)
+
+alpha = 0.3
+gama = 0.4
+
+nenhuma = int(0.3 * N)
+intermediaria = int(0.4 * N)
+detalhada = 500 - nenhuma - intermediaria
+
+x = np.hstack((np.ones(shape = nenhuma), 
+                np.ones(shape = intermediaria) * 2, 
+                np.ones(shape = detalhada) * 3))
+x = x[importancia.argsort()]
+print('M: {} | F: {}'.format(M(x), F(x)))
+X.append(x)
+sol_M = M(x)
+sol_F = F(x)
+
+# # random
+# x = np.random.choice(len(mpdb), len(equipdb)) + 1
+# print('M: {} | F: {}'.format(M(x), F(x)))
+# X.append(x)
+# sol_M = M(x)
+# sol_F = F(x)
 
 # min M
 x = np.ones(shape = 500)
@@ -82,7 +111,7 @@ max_M = M(x)
 min_F = F(x)
 
 # export
-X = pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index = False)
+pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index = False)
 
 # try predict s-metric
 ideal = (max_F - min_F) * (max_M - min_M)
