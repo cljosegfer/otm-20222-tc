@@ -48,12 +48,16 @@ FminF1 = fEvalSolution(XminF1,ProblemData);
 FminF2 = fEvalSolution(XminF2,ProblemData);
 %-------------------------------------------------------------------------
 Fv = zeros(2,size(X,1));
-for i = 1:size(X,1)
-    fprintf('Evaluating Solution #%4d\n',i);
+h = waitbar(0, '0');
+total = size(X,1);
+for i = 1:total
+    waitbar(i / total, h, sprintf('%4d / %4d', i, total))
+    % fprintf('Evaluating Solution #%4d\n',i);
     Ft = fEvalSolution(X(i,:),ProblemData);
     Fv(1,i) = Ft(1);
     Fv(2,i) = Ft(2);
 end
+close (h);
 %=========================================================================
 
 %=========================================================================
