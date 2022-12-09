@@ -86,6 +86,6 @@ X = pd.DataFrame(X).astype('int32').to_csv('tc/xhat.csv', header = False, index 
 
 # try predict s-metric
 ideal = (max_F - min_F) * (max_M - min_M)
-sol = (sol_F - min_F) * (sol_M - min_M)
+sol = (max_F - sol_F) * (max_M - sol_M)
 hv = sol / ideal
 print(hv)
