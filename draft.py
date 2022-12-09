@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 from silh import silh
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 def M(x):
     # _, count = np.unique(x, return_counts = True)
@@ -112,4 +113,53 @@ plt.figure()
 plt.plot(alphas, log)
 plt.xlabel('alpha')
 plt.ylabel('F(x)')
-plt.show()
+# plt.show()
+plt.savefig('fig/intuicao1d.png', dpi = 150)
+
+# modulo deslizante 2d
+N = len(equipdb)
+
+alpha = 0.3
+gama = 0.4
+
+nenhuma = int(0.3 * N)
+intermediaria = int(0.4 * N)
+detalhada = 500 - nenhuma - intermediaria
+
+x = np.hstack((np.ones(shape = nenhuma), 
+                np.ones(shape = intermediaria) * 2, 
+                np.ones(shape = detalhada) * 3))
+x = x[importancia.argsort()]
+
+num = 100
+alphas = np.linspace(start = 0, stop = 1, num = num)
+gamas = np.linspace(start = 0, stop = 1, num = num)
+log = []
+for alpha in tqdm(alphas):
+    loglog = []
+    for gama in gamas:
+        if alpha + gama > 1:
+            loglog.append(1e3)
+            continue
+        
+        nenhuma = int(alpha * N)
+        intermediaria = int(gama * N)
+        detalhada = 500 - nenhuma - intermediaria
+        
+        x = np.hstack((np.ones(shape = nenhuma), 
+                        np.ones(shape = intermediaria) * 2, 
+                        np.ones(shape = detalhada) * 3))
+        x = x[importancia.argsort()]
+        
+        loglog.append(F(x))
+    log.append(loglog)
+log = np.array(log).T
+
+# plot
+plt.figure()
+extent = [gamas[0], gamas[-1], alphas[-1], alphas[0]]
+plt.imshow(log, cmap = 'gray', extent = extent)
+plt.xlabel('gama')
+plt.ylabel('alpha')
+# plt.show()
+plt.savefig('fig/intuicao2d.png', dpi = 150)
