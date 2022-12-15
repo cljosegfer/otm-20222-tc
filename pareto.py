@@ -64,6 +64,13 @@ class rea():
         end = time.time()
         return mask, end - start
     
+    def _hist(self, X):
+        counts, bins = np.histogram(X)
+        
+        plt.figure()
+        plt.hist(bins[:-1], bins, weights = counts)
+        plt.xticks([1, 2, 3])
+    
     def pareto(self, num = 100, report = True):
         N = len(self.equipdb)
         start = 0
@@ -94,6 +101,9 @@ class rea():
         hv = np.array([[report[-2], report[-1]] for report in log])
         mask, deltat = self._filter(hv)
         border = hv[mask]
+        
+        # self._hist(np.array(X))
+        # self._hist(np.array(X)[mask])
 
         # export
         export = pd.DataFrame(X).iloc[mask].astype('int32')
