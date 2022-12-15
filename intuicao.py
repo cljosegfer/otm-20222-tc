@@ -66,7 +66,7 @@ f = equipdb['f'].values
 worst = F_ns(x = np.ones(shape = 500))
 esperado = np.copy(worst)
 
-# silh(np.copy(esperado), 'E(pf)', 'F esperado iniciado')
+silh(np.copy(esperado), 'E(pf)')
 
 importancia = np.argsort(esperado)
 
