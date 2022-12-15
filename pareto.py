@@ -112,6 +112,7 @@ class rea():
         if report:
             print('num: {} | sol: {} | filter: {} | time: {}'.format(num, len(X), len(export), deltat))
         
+        # return export, border, len(X)
         return export, border
 
     def pareto_naive(self, num = 100, report = True):
@@ -143,4 +144,5 @@ class rea():
         if report:
             print('num: {} | sol: {} | filter: {} | time: {}'.format(num, len(X), len(export), deltat))
         
+        # return export, border, len(X)
         return export, border
