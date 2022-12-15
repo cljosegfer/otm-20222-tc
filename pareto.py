@@ -76,6 +76,8 @@ class rea():
         gamas = np.linspace(start = start, stop = stop, num = num)
         for alpha in tqdm(alphas):
             for gama in gamas:
+        # for gama in tqdm(gamas):
+        #     for alpha in alphas:
                 if alpha + gama > 1:
                     continue
                 
